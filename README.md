@@ -7,7 +7,7 @@ The package provides 1) the framework for modeling general sum stochastic games 
 
 
 ## General sum stochastic games (GSSGs)
-GSSGs is generalized Markov decision processes (MDPs) for the multi-agent situation, and represented as a tuple _<_ _D,_ _S,_ ___A__,_  _T,_ ___R___ _>_ (right side of following figure). 
+GSSGs is generalized Markov decision processes (MDPs) for the multi-agent situation, and represented as a tuple <_D,_ _S,_ ___A,___  _T,_ ___R___> (right side of following figure). 
 _D_ represents agents set, _S_ represents the state of an environment, ___A___ represents joint action of all agents, and ___R___ represents joint reward for each agent. In contrast to MDPs, GSSGs allow multiple agents to affect the environment and receive rewards simultaneously. 
 We can model many phenomena in the real world with this model (e.g., trading in market place, negotiation of stakeholders, or collaborative task of robots). 
 
