@@ -7,7 +7,7 @@ The package provides 1) the framework for modeling general sum stochastic games 
 
 
 ## General sum stochastic games (GSSGs)
-GSSGs is generalized Markov decision processes (MDPs) for the multi-agent situation, and represented as a tuple _< D, S, __A__, T, __R__@>_ (right side of following figure). 
+GSSGs is generalized Markov decision processes (MDPs) for the multi-agent situation, and represented as a tuple _< D, S, __A__, T, __R__ >_ (right side of following figure). 
 _D_ represents agents set, _S_ represents the state of an environment, ___A___ represents joint action of all agents, and ___R___ represents joint reward for each agent. In contrast to MDPs, GSSGs allow multiple agents to affect the environment and receive rewards simultaneously. 
 We can model many phenomena in the real world with this model (e.g., trading in market place, negotiation of stakeholders, or collaborative task of robots). 
 
@@ -15,8 +15,8 @@ We can model many phenomena in the real world with this model (e.g., trading in 
 
 
 ## Multi-agent reinforcement learning (MARL)
-MARL is used for learning agent policies _ƒÎ_ concurrently. 
-_ƒÎ_  is a mapping function from a current observed state to a particular agent action (see above figure). 
+MARL is used for learning agent policies _$\pi$_ concurrently. 
+_$\pi$_  is a mapping function from a current observed state to a particular agent action (see above figure). 
 Each agent policy is learnt to maximize expected cumulative its own rewards, converging to equilibrium (typically Nash equilibrium) where all agent policies cannot be modified to better one. 
 This package provides variations of [PHC, PHC-Wolf](http://www.cs.cmu.edu/~mmv/papers/01ijcai-mike.pdf), and [Correlated-Q Learning](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf) in addition to GSSGs version of single-agent reinforcement learning implemented in PyBrain. 
 
