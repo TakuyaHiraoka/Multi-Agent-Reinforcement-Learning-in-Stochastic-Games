@@ -7,17 +7,17 @@ The package provides 1) the framework for modeling general sum stochastic games 
 
 
 ## General sum stochastic games (GSSGs)
-GSSGs is generalized Markov decision processes (MDPs) for the multi-agent situation, and represented as a tuple <_D,_ _S,_ ___A,___  _T,_ ___R___> (right side of following figure). 
-_D_ represents agents set, _S_ represents the state of an environment, ___A___ represents joint action of all agents, and ___R___ represents joint reward for each agent. In contrast to MDPs, GSSGs allow multiple agents to affect the environment and receive rewards simultaneously. 
-We can model many phenomena in the real world with this model (e.g., trading in market place, negotiation of stakeholders, or collaborative task of robots). 
+GSSGs is generalized Markov decision processes (MDPs) for multi-agent situations, and represented as a tuple <_D,_ _S,_ ___A,___  _T,_ ___R___> (right side of following figure). 
+_D_ represents a agents set, _S_ represents a state of an environment, ___A___ represents a joint action of all agents, and ___R___ represents a joint reward for each agent. In contrast to MDPs, GSSGs allows multiple agents to affect the environment and receive rewards simultaneously. 
+We can model many phenomena in the real world with GSSGs (e.g., trading in market place, negotiation of stakeholders, or collaborative task of robots). 
 
 ![img](./Images/MDPsandGSSGs.jpg "MDPs and GSSGs")
 
 
 ## Multi-agent reinforcement learning (MARL)
 MARL is used for learning agent policies $\pi$ concurrently. 
-$\pi_{i}$ is a mapping function from a current observed state to a ith agent action (see above figure). 
-Each agent policy is learnt to maximize expected cumulative its own rewards, converging to equilibrium (typically Nash equilibrium) where all agent policies cannot be modified to better one. 
+$\pi$ is a mapping function from an observed state _S_ to an agent action _A_ (see above figure). 
+Each agent policy is learnt to maximize its own expected cumulative rewards, converging to equilibrium (typically Nash equilibrium) where all agent policies cannot be modified to better one. 
 This package provides variations of [PHC, PHC-Wolf](http://www.cs.cmu.edu/~mmv/papers/01ijcai-mike.pdf), and [Correlated-Q Learning](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf) in addition to GSSGs version of single-agent reinforcement learning implemented in PyBrain. 
 
 
@@ -32,19 +32,19 @@ To use this package, we need 1) install all requirements, 2) implement GSSGs to 
 
 ## 2. Implement GSSGs 
 Implement the class extending EpisodicTaskSG (pybrainSG.rl.environments.episodicSG) and the class extending Environment class (pybrain.rl.environments.environment). 
-Some examples of implementation are put on following directory: 
+Some examples of implementation are put on following package: 
 
 * pybrainSG.rl.examples.tasks
 
-For example, "gridgames.py" provides am example of grid world domain, and "staticgame.py" provides an example of bi-matrix game domain. 
+For example, "gridgames.py" provides examples of grid world domain, and "staticgame.py" provides examples of bi-matrix game domain. 
 
 ## 3. Apply MARL to implemented GSSGs
 To apply MARL to implemented GSSGs, we need construct an agent set and an experiment. 
-You can find examples of construction in following folder: 
+You can find examples of a construction in the following folder: 
 
 * pybrainSG.rl.examples
 
-For example, "example_gridgames.py" in "ceq" directory shows how to use one of Correlated-Q learning implementations in grid game domain. 
+For example, "example_gridgames.py" in "ceq" package shows how to use one of Correlated-Q learning implementations in the grid game domain. 
 
 # Future work
 Implement state-of-art MARL algorithm: 
