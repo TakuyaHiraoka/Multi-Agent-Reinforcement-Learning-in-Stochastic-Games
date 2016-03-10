@@ -14,7 +14,7 @@ class IndexableAgent(Agent):
     indexOfAgent=None
     
     def __init__(self, index=None):
-        self.indexOfAgent=index
+        self.setIndexOfAgent(index)
         
     def setIndexOfAgent(self,index):
         """ set index to agent.

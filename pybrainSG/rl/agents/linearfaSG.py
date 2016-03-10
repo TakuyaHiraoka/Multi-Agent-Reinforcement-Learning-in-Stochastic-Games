@@ -26,9 +26,9 @@ class LinearFA_AgentSG(LoggingAgentSG):
     greedy = False
      
     def __init__(self, learner, num_features, num_actions, num_agents, index, **kwargs):
-        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents, index, **kwargs)
         assert isinstance(learner, IndexableValueBasedLearner), "learner should be indexable."
         self.learner = learner
+        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents, index, **kwargs)
         self.learner._behaviorPolicy = self._actionProbs
         self.reset()
         self.agentProperties["requireOtherAgentsState"]=False

@@ -1,5 +1,5 @@
 '''
-Created on 2016/02/19
+Created on 2016/03/10
 
 @author: takuya-hv2
 '''
@@ -8,17 +8,16 @@ from pybrain.utilities import drawIndex
 from pybrainSG.rl.leaners.valuebased.indexablevaluebased import IndexableValueBasedLearner
 from scipy import array
 import numpy as np
-class PHC_Agent(LoggingAgentSG):
+
+#Implmenting now
+class SGSP_Agent(LoggingAgentSG):
     """ 
-    Agent based on PHC RL algorithms put on: 
-    pybrainSG.rl.leaners.valuebased.phc
-    """            
-    init_exploration = 0.01   # aka epsilon
+    Agent based on SPSG RL algorithms put on: 
+    pybrainSG.rl.leaners.valuebased.spsg
+    """
+    init_exploration = 0.3   # aka epsilon
     exploration_decay = 0.99 # per episode        
-    
-    init_temperature = 1.
-    temperature_decay = 0.99 # per episode
-    
+        
     # flags for exploration strategies
     epsilonGreedy = True
     learning = True
@@ -31,7 +30,7 @@ class PHC_Agent(LoggingAgentSG):
         self.reset()
         self.agentProperties["requireOtherAgentsState"]=False
         self.agentProperties["requireJointAction"]=False
-        self.agentProperties["requireJointReward"]=False
+        self.agentProperties["requireJointReward"]=True
         for prop in self.learner.getProperty().keys():
             if learner.getProperty()[prop]:
                 assert self.getProperty()[prop], "learners property should same to that of agents."
@@ -60,7 +59,6 @@ class PHC_Agent(LoggingAgentSG):
         
     def reset(self):
         LoggingAgentSG.reset(self)
-        self._temperature = self.init_temperature
         self._expl_proportion = self.init_exploration
         self.learner.reset()    
         self._oaro = None
@@ -73,7 +71,6 @@ class PHC_Agent(LoggingAgentSG):
         if self.learning and not self.learner.batchMode:
             self.learner.newEpisode()
         else:
-            self._temperature *= self.temperature_decay
             self._expl_proportion *= self.exploration_decay      
             self.learner.newEpisode()
                         
@@ -97,6 +94,5 @@ class PHC_Agent(LoggingAgentSG):
             :key index: index of agent
             :type index: integer
         """ 
-        super(PHC_Agent, self).setIndexOfAgent(index)
+        super(SGSP_Agent, self).setIndexOfAgent(index)
         self.learner.setIndexOfAgent(index)
-        

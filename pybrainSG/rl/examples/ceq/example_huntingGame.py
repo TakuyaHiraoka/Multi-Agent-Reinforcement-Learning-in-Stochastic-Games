@@ -17,7 +17,7 @@ if __name__ == '__main__':
     ma=MultiAgent()
     HuntingGame.numberofAgents=2
     for i in range(HuntingGame.numberofAgents):
-        learner= CEQ_NN(
+        learner= CEQ_Lin(
                             num_features=(HuntingGame.numberofAgents*2+HuntingGame.numberofAnimals*2+1),
                             num_actions=np.ones(HuntingGame.numberofAgents,dtype=np.int8)*len(HuntingGame.availableActions),
                             num_agents=HuntingGame.numberofAgents,

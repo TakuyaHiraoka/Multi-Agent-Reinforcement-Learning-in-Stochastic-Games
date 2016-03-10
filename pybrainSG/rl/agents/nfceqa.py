@@ -25,9 +25,9 @@ class NFCEQ_Agent(LoggingAgentSG):
     greedy = False
      
     def __init__(self, learner, num_features, num_actions, num_agents, index, **kwargs):
-        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents, index, **kwargs)
         assert isinstance(learner, NFCEQ), "learner should be instance of NFCEQ."
         self.learner = learner
+        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents, index, **kwargs)
         # if learner is available, tell it the module and data
         if self.learner is not None:
             self.learner.dataset = self.history

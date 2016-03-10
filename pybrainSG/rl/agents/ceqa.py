@@ -25,9 +25,9 @@ class CEQ_Agent(LoggingAgentSG):
     greedy = False
      
     def __init__(self, learner, num_features, num_actions, num_agents, index, **kwargs):
+        self.learner = learner
         LoggingAgentSG.__init__(self, np.ones(num_agents, dtype=np.int8)*num_features, num_actions, num_agents, index, **kwargs)
         assert isinstance(learner, IndexableValueBasedLearner), "learner should be indexable."
-        self.learner = learner
         self.learner._behaviorPolicy = self._actionProbs
         self.reset()
         self.agentProperties["requireOtherAgentsState"]=False

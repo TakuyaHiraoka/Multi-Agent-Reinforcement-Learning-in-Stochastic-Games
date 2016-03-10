@@ -38,7 +38,7 @@ if __name__ == '__main__':
         print "Reward for Agents"
         print "Average Reward for Agents (at the end of episode)"
         #Two phase leanring
-        rewards=exp.doEpisodes(number=200)#firstphase
+        rewards=exp.doEpisodes(number=10)#firstphase
         ma.learn()
         for numBatch in range(40):
             avr=0.0

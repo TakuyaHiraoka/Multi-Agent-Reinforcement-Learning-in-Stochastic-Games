@@ -33,7 +33,7 @@ if __name__ == '__main__':
         exp=EpisodicExperimentSG(task,ma)
         print "Average reward for agents at the end of episode:"
         #Two phase learning
-        rewards=exp.doEpisodes(number=30)#first phase
+        rewards=exp.doEpisodes(number=10)#first phase
         ma.learn()
         for numBatch in range(40):
             avr=np.array([0.0,0.0])

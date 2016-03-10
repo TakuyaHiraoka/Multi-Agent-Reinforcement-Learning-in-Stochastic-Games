@@ -17,10 +17,10 @@ class LearningAgentSG(LoggingAgentSG):
         """
         :key module: the acting module
         :key learner: the learner (optional) """
-        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents,index)
         assert isinstance(learner, IndexableValueBasedLearner), "learner should be indexable."
         self.module = module
         self.learner = learner
+        LoggingAgentSG.__init__(self, num_features, num_actions, num_agents,index)
 
         # if learner is available, tell it the module and data
         if self.learner is not None:

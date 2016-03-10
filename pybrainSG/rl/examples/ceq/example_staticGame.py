@@ -14,7 +14,7 @@ if __name__ == '__main__':
     ma=MultiAgent()
     for i in range(2):
         
-        learner= CEQ_NN(
+        learner= CEQ_Lin(
                             num_features=1,
                             num_actions=np.ones(2,dtype=np.int8)*len(SimpleMatrixGame.availableActions),
                             num_agents=2,
