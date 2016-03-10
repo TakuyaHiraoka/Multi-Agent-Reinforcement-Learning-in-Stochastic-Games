@@ -15,21 +15,21 @@ class SGSP_Agent(LoggingAgentSG):
     Agent based on SPSG RL algorithms put on: 
     pybrainSG.rl.leaners.valuebased.spsg
     """
-    init_exploration = 0.3   # aka epsilon
-    exploration_decay = 0.99 # per episode        
+    init_exploration = 0.005   # aka epsilon
+    exploration_decay = 0.9999 # per episode        
         
     # flags for exploration strategies
     epsilonGreedy = True
     learning = True
     
-    def __init__(self, learner, numAgents, index, **kwargs):
+    def __init__(self, learner, num_actions, numAgents, index, **kwargs):
         assert isinstance(learner, IndexableValueBasedLearner), "learner should be indexable."
         self.learner = learner
-        LoggingAgentSG.__init__(self, np.ones(numAgents)*learner.num_features, np.ones(numAgents), numAgents, index, **kwargs)
+        LoggingAgentSG.__init__(self, np.ones(numAgents)*learner.num_features, num_actions, numAgents, index, **kwargs)
         self.learner._behaviorPolicy = self._actionProbs
         self.reset()
         self.agentProperties["requireOtherAgentsState"]=False
-        self.agentProperties["requireJointAction"]=False
+        self.agentProperties["requireJointAction"]=True
         self.agentProperties["requireJointReward"]=True
         for prop in self.learner.getProperty().keys():
             if learner.getProperty()[prop]:
@@ -40,13 +40,14 @@ class SGSP_Agent(LoggingAgentSG):
             return self.learner._softmaxPolicy(state)
         elif self.epsilonGreedy:
             return (self.learner._softmaxPolicy(state) * (1 - self._expl_proportion) 
-                    + self._expl_proportion / float(self.learner.num_actions))
+                    + self._expl_proportion / float(self.learner.num_actions[self.indexOfAgent]))
     
     def getAction(self):
         self.lastaction = drawIndex(self._actionProbs(self.lastobs), True)
         if self.learning and not self.learner.batchMode and self._oaro is not None:
             self.learner._updateWeights(*(self._oaro + [self.lastaction]))
-            self._oaro = None          
+            self._oaro = None
+#         print "Agent " + str(self.indexOfAgent) + ": " + str(self.lastaction)
         return array([self.lastaction])
         
     def integrateObservation(self, obs):

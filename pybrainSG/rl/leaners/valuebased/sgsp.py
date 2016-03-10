@@ -37,7 +37,7 @@ class ON_SGSP_FA(IndexableValueBasedLearner):
         self._behaviorPolicy = self._softmaxPolicy
         self.reset()
         self.ownerAgentProperties["requireOtherAgentsState"]=False
-        self.ownerAgentProperties["requireJointAction"]=False
+        self.ownerAgentProperties["requireJointAction"]=True
         self.ownerAgentProperties["requireJointReward"]=True
         
     def _pi(self, state):
@@ -46,11 +46,11 @@ class ON_SGSP_FA(IndexableValueBasedLearner):
         abstractMethod()
            
     def _softmaxPolicy(self, state):
-        tmp = zeros(self.num_actions)
+        tmp = zeros(self.num_actions[self.indexOfAgent])
         pi=self._pi(state)
         rand=np.random.rand()
         cum=0.0
-        for i in range(self.num_actions):
+        for i in range(self.num_actions[self.indexOfAgent]):
             cum+=pi[i]
             if rand < cum:
                 tmp[i] = 1
@@ -73,34 +73,34 @@ class ON_SGSP_FA(IndexableValueBasedLearner):
         
 class ON_SGSP_NN(ON_SGSP_FA):
     '''ON_SGSP with neural function approximation. '''
-    weightdecay=0.001
+    weightdecay=0.01
     zeta=0.00001
     #
-    cn=0.01
-    bn=0.01
+    cn=0.05
+    bn=0.05
     #
-    decayCn=0.99
-    decayBn=0.985
+    decayCn=0.9999
+    decayBn=0.9995
 
     
-    def __init__(self, num_features, num_actions, num_agents, indexOfAgent=None):    
-        ON_SGSP_FA.__init__(self, num_features, num_actions, indexOfAgent)
+    def __init__(self, num_features, num_actions, num_agents, index):    
+        ON_SGSP_FA.__init__(self, num_features, num_actions, index)
         self.num_agents= num_agents
-        self.linV = []
-        for _ in range(self.num_agents):
-            self.linV.append(buildNetwork(num_features, 
+        self.linQ = []
+        for iAgent in range(self.num_agents):
+            self.linQ.append(buildNetwork(num_features + num_actions[iAgent], 
                                          num_features*2, 
                                          1, 
                                          hiddenclass = SigmoidLayer, 
                                          outclass = LinearLayer))
-        self.linGradient = buildNetwork(num_features + num_actions, 
-                                     (num_features + num_actions)*2, 
+        self.linGradient = buildNetwork(num_features + num_actions[self.indexOfAgent], 
+                                     (num_features + num_actions[self.indexOfAgent])*2, 
                                      1, 
                                      hiddenclass = SigmoidLayer, 
                                      outclass = LinearLayer)
         self.linPolicy = buildNetwork(num_features, 
-                                       (num_features + num_actions)*2, 
-                                       num_actions, 
+                                       (num_features + num_actions[self.indexOfAgent])*2, 
+                                       num_actions[self.indexOfAgent], 
                                        hiddenclass = SigmoidLayer, 
                                        outclass = SigmoidLayer)
         assert self.decayBn < self.decayCn, "Cn shold be bigger than Bn."
@@ -110,12 +110,12 @@ class ON_SGSP_NN(ON_SGSP_FA):
         values = np.array(self.linPolicy.activate(r_[state]))
         z=np.sum(values)
         return (values/z).flatten()
-    
-    def _Values(self, state, iAgent):
-        """ Return vector of values for all actions, 
+
+    def _qValues(self, state, iAgent):
+        """ Return vector of q-values for all actions, 
         given the state(-features). """
-        values = np.array(self.linV[iAgent].activate(r_[state]))
-        return values[0]
+        values = np.array([self.linQ[iAgent].activate(r_[state, one_to_n(i, self.num_actions[iAgent])]) for i in range(self.num_actions[iAgent])])
+        return values.flatten()
     
     def _sgn(self, val):
         if val > self.zeta:
@@ -130,45 +130,52 @@ class ON_SGSP_NN(ON_SGSP_FA):
             return 1.0
         elif val < 0:
             return 0.0
-        else: 
+        else:
             return val
-
-            
+        
+                    
     def _updateWeights(self, state, action, reward, next_state): 
         """ state and next_state are vectors, action is an integer. """
-        #update Q-value function approximator
+        #update Q-value function approximator (estimate Q-value instead of V) 
         BellmanErrors=np.zeros(self.num_agents)
         for iAgent in range(self.num_agents):
-            vValC=self._Values(state,iAgent)
-            vValN=self._Values(next_state,iAgent)
-            BellmanError=(reward[iAgent] + self.rewardDiscount * vValN) - vValC
-            target=vValC+self.cn*BellmanError
+            vValC=self._qValues(state,iAgent)
+            vValN=self._qValues(next_state,iAgent)
+            vArgMaxValC=r_argmax(vValC)
+            vArgMaxValN=r_argmax(vValN)
+            BellmanError=(reward[iAgent] + self.rewardDiscount * vValN[vArgMaxValN]) - vValC[vArgMaxValC]
+            target=vValC[action[iAgent]]+self.cn*((reward[iAgent] + self.rewardDiscount * vValN[vArgMaxValN]) - vValC[action[iAgent]])
             BellmanErrors[iAgent]=BellmanError
-            inp=r_[asarray(state)]
-            trainer4LinV=BackpropTrainer(self.linV[iAgent], learningrate=1.0)
-            ds = SupervisedDataSet(self.num_features,1)
+            inp=r_[state, one_to_n(action[iAgent], self.num_actions[iAgent])]
+            ds = SupervisedDataSet(self.num_features+self.num_actions[iAgent],1)
             ds.addSample(inp, target)
-            trainer4LinV.trainOnDataset(ds)
+            BackpropTrainer(self.linQ[iAgent], learningrate=1.0, weightdecay=self.weightdecay).trainOnDataset(ds)
+            
         #Estimate gradient
-        grad=self.linGradient.activate(np.r_[asarray(state), one_to_n(action, self.num_actions)])[0]
-        target=grad+self.cn*(np.sum(copy.deepcopy(BellmanErrors), axis=0)-grad)
-        inp=np.r_[asarray(state), one_to_n(action, self.num_actions)]
-        ds = SupervisedDataSet(self.num_features+self.num_actions,1)
+        grad=self.linGradient.activate(np.r_[asarray(state), one_to_n(action[self.indexOfAgent], self.num_actions[self.indexOfAgent])])[0]
+        target=grad+self.cn*(np.sum(BellmanErrors, axis=0)-grad)
+        inp=np.r_[asarray(state), one_to_n(action[self.indexOfAgent], self.num_actions[self.indexOfAgent])]
+        ds = SupervisedDataSet(self.num_features+self.num_actions[self.indexOfAgent],1)
         ds.addSample(inp, target)
-        BackpropTrainer(self.linGradient, learningrate=1.0).trainOnDataset(ds)
-        
+        BackpropTrainer(self.linGradient, learningrate=1.0,weightdecay=self.weightdecay).trainOnDataset(ds)
+#         print str(self.indexOfAgent) + "-th agents optimization info.:"
+#         print "All Bellman errors: "+str(np.sum(BellmanErrors, axis=0))
+#         print "Self Bellman error: " + str(np.absolute(BellmanErrors[self.indexOfAgent]))
+#         print "Self Q-value: " + str(self._qValues(state,self.indexOfAgent))
         #Update policy
         c_pi=self._pi(state)
-        firstTerm=c_pi[action]
+#         print "Policy: " + str(c_pi)
+        firstTerm=c_pi[action[self.indexOfAgent]]
         secondTerm=(np.sqrt(firstTerm) 
                     * np.absolute(BellmanErrors[self.indexOfAgent]) 
-                    * self.linGradient.activate(np.r_[asarray(state), one_to_n(action, self.num_actions)])[0])
+                    * self._sgn(-1.0*self.linGradient.activate(np.r_[asarray(state), one_to_n(action[self.indexOfAgent], self.num_actions[self.indexOfAgent])])[0])
+                    )
         target=c_pi
-        target[action]=self._gamma(firstTerm - self.bn * secondTerm)
+        target[action[self.indexOfAgent]]=self._gamma(firstTerm - self.bn * secondTerm)
         inp=r_[asarray(state)]
-        ds = SupervisedDataSet(self.num_features,self.num_actions)
+        ds = SupervisedDataSet(self.num_features, self.num_actions[self.indexOfAgent])
         ds.addSample(inp, target)
-        BackpropTrainer(self.linPolicy, learningrate=1.0).trainOnDataset(ds)
+        BackpropTrainer(self.linPolicy, learningrate=1.0,weightdecay=self.weightdecay).trainOnDataset(ds)
         
         #update bn, cn
         self.bn = self.bn * self.decayBn

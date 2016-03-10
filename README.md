@@ -18,7 +18,7 @@ We can model many phenomena in the real world with GSSGs (e.g., trading in marke
 MARL is used for learning agent policies $\pi$ concurrently. 
 $\pi$ is a mapping function from an observed state _S_ to an agent action _A_ (see above figure). 
 Each agent policy is learnt to maximize its own expected cumulative rewards, converging to equilibrium (typically Nash equilibrium) where all agent policies cannot be modified to better one. 
-This package provides variations of [PHC, PHC-Wolf](http://www.cs.cmu.edu/~mmv/papers/01ijcai-mike.pdf), and [Correlated-Q Learning](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf) in addition to GSSGs version of single-agent reinforcement learning implemented in PyBrain. 
+This package provides variations of [PHC, PHC-WoLF](http://www.cs.cmu.edu/~mmv/papers/01ijcai-mike.pdf), [Correlated-Q Learning](https://www.aaai.org/Papers/ICML/2003/ICML03-034.pdf), [SGSP](http://www.ifaamas.org/Proceedings/aamas2015/aamas/p1371.pdf) in addition to GSSGs version of single-agent reinforcement learning implemented in PyBrain. 
 
 
 # How to use this package?
@@ -47,9 +47,8 @@ You can find examples of a construction in the following folder:
 For example, "example_gridgames.py" in "ceq" package shows how to use one of Correlated-Q learning implementations in the grid game domain. 
 
 # Future work
-Implement state-of-art MARL algorithm: 
-
-* Prasad, H. L., Prashanth LA, and Shalabh Bhatnagar. "Two-Timescale Algorithms for Learning Nash Equilibria in General-Sum Stochastic Games." Proceedings of the 2015 International Conference on Autonomous Agents and Multi-agent Systems. International Foundation for Autonomous Agents and Multi-agent Systems, 2015.
+Refactoring and cleaning up source codes.
+Introducing inverse reinforcement learning for estimation of other agents reward structure. 
 
 # Author
 [Takuya Hiraoka](http://isw3.naist.jp/~takuya-h/)

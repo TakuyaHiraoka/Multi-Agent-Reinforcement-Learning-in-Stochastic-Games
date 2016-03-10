@@ -15,11 +15,15 @@ if __name__ == '__main__':
     for i in range(2):
         learner= ON_SGSP_NN(
                              num_features=1, 
-                             num_actions=len(SimpleMatrixGame.availableActions),
-                             num_agents=2
-                             )
+                             num_actions=np.ones(2,dtype=np.int8)*len(SimpleMatrixGame.availableActions),
+                             num_agents=2,
+                             index=i)
         learner.rewardDiscount=0.0
-        agent= SGSP_Agent(learner,numAgents=2,index=i)
+        agent= SGSP_Agent(
+                          learner,
+                          num_actions=np.ones(2,dtype=np.int8)*len(SimpleMatrixGame.availableActions),
+                          numAgents=2,
+                          index=i)
         ma.addAgent(agent)
     task=StaticGameTask()
     
